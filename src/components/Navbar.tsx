@@ -7,7 +7,11 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton'
 import MenuIcon from '@mui/icons-material/Menu';
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  username: string
+}
+
+const Navbar: React.FC<NavbarProps> = ({ username }) => {
   return (
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
@@ -22,7 +26,7 @@ const Navbar: React.FC = () => {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Username
+              {username}
             </Typography>
             <Button color="inherit">Login</Button>
           </Toolbar>

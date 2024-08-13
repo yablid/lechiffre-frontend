@@ -1,6 +1,6 @@
 /* src/components/UserRegistrationForm.tsx */
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api/default';
 import { TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import Button from '@mui/material/Button';
 
@@ -18,8 +18,8 @@ const UserRegistrationForm: React.FC<UserRegistrationFormProps> = () => {
       role_id: role,
     }
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/users/register`,
+      const response = await api.post(
+        `/users/register`,
         userData
       );
       console.log('User registered:', response.data);
