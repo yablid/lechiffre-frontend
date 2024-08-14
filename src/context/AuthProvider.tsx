@@ -2,19 +2,19 @@
 import React, { createContext, useState, useEffect, useCallback, useContext, ReactNode } from 'react';
 import api from '../api/default';
 import { jwtDecode } from 'jwt-decode';
+import { verifyAccessToken, verifyRefreshToken, verifyIdToken } from "../services/authService";
 
 interface IAuthContext {
   user: IUser | null;
   loading: boolean;
-  validateTokens: () => Promise<boolean>;
   login: (accessToken: string, idToken: string) => void;
   logout: () => void;
-  refreshToken: () => Promise<boolean>;
 }
 
 export interface IUser {
-  sub: string,
-  username: string;
+  sub?: string,
+  roles?: number[];
+  username?: string;
 }
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
@@ -23,135 +23,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const verifyAccessToken = async (): Promise<boolean> => {
-    console.log("AuthProvider verifying access token...");
+  console.log("AuthProvider user information: ", user);
 
-    const accessToken = sessionStorage.getItem('access_token');
-    if (!accessToken) return false;
+  const initAuth = useCallback(async () => {
+    setLoading(true);
 
-    try {
-      const response = await api.get<{ valid: boolean }>(
-        '/auth/access-token',
-        {
-          headers: {Authorization: `Bearer ${accessToken}`},
-          withCredentials: true
-        }
-      );
-      console.log("AuthProvider received response: ", response.data);
-      return response.data.valid;
-    } catch (error) {
-      console.error('AuthProvider: access token invalid:', error);
-      return false;
-    }
-  };
-
-  const identify = async (): Promise<boolean> => {
-    const idToken = sessionStorage.getItem('id_token');
-    if (idToken) {
-      console.log("idToken found, setting user data in context.")
-      try {
-        const decoded = jwtDecode<IUser>(idToken);
-        setUser({
-          sub: decoded.sub,
-          username: decoded.username,
-        });
-        return true;
-      } catch (error) {
-        console.error('Invalid id_token:', error);
-        return false;
-      }
-    }
-
-    try {
-      console.log("No idToken found, calling api.")
-      const idResponse = await api.get<{ idToken: string }>('/auth/identify');
-      if (idResponse.data && idResponse.data.idToken) {
-        sessionStorage.setItem('id_token', idResponse.data.idToken);
-        const decoded = jwtDecode<IUser>(idResponse.data.idToken);
-        setUser({
-          sub: decoded.sub,
-          username: decoded.username,
-        });
-        return true;
-      } else {
-        console.error('Unable to identify user');
-        return false;
-      }
-    } catch (error) {
-      console.error('Unable to identify user', error);
-      return false;
-    }
-  };
-
-  const refreshToken = async (): Promise<boolean> => {
-    try {
-      const response = await api.post<{ accessToken: string, idToken: string }>(
-        `/auth/refresh-token`,
-        null,
-        { withCredentials: true }
-      );
-
-      console.log("AuthProvider refreshToken received data: ", response.data);
-      sessionStorage.setItem('access_token', response.data.accessToken);
-      sessionStorage.setItem('id_token', response.data.idToken);
-
-      const decodedToken = jwtDecode<IUser>(response.data.idToken);
-      const user: IUser = {
-        sub: decodedToken.sub,
-        username: decodedToken.username,
-      };
-      setUser(user);
-      return true;
-    } catch {
-      console.error('Invalid, expired, or missing refresh token');
-      setUser(null);
-      return false;
-    }
-  };
-
-  const validateTokens = useCallback(async (): Promise<boolean> => {
-    console.log("AuthProvider checking for credentials...")
-    if (await verifyAccessToken()) {
-      console.log("Valid access token.")
-      if (await identify()) {
-        console.log("Identified user.")
-        setLoading(false);
-        return true;
-      }
-    }
-    console.log("No valid access token. Checking refresh token.")
-    if (await refreshToken()) {
-      console.log("Valid refreshToken found.")
+    let currentUser = await verifyAccessToken();
+    if (!currentUser) {
+      currentUser = await verifyRefreshToken();
+      setUser(currentUser);
       setLoading(false);
-      return true;
+      return;
+    } else {
+      const idUser = await verifyIdToken();
+      if (idUser) {
+        setUser({ ...currentUser, ...idUser });
+      } else {
+        setUser(currentUser);
+      }
     }
-    console.log("No valid refresh token.")
     setLoading(false);
-    return false;
   }, []);
 
   useEffect(() => {
-    const auth = async () => {
-      const authorized = await validateTokens();
-      if (authorized) {
-        window.location.href  = '.work';
-      }
-    }
-    auth().catch(console.error);
-  }, [validateTokens]);
+    initAuth().catch(console.error);
+  }, [initAuth]);
 
   const login = (accessToken: string, idToken: string) => {
     sessionStorage.setItem('access_token', accessToken);
     sessionStorage.setItem('id_token', idToken);
-    console.log("AuthProvider login set access and id tokens");
-
     const decodedToken = jwtDecode<IUser>(idToken);
-    const user: IUser = {
-      sub: decodedToken.sub,
-      username: decodedToken.username,
-    };
-    setUser(user);
-    console.log("AuthProvider login set user: ", user);
+    setUser(decodedToken);
+    console.log("AuthProvider login set user: ", decodedToken);
   };
 
   const logout = () => {
@@ -163,7 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, validateTokens, login, logout, refreshToken }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

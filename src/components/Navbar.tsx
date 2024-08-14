@@ -1,4 +1,6 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthProvider';
 import Box from '@mui/material/Box';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -12,6 +14,14 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ username }) => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  }
+
   return (
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
@@ -28,7 +38,7 @@ const Navbar: React.FC<NavbarProps> = ({ username }) => {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               {username}
             </Typography>
-            <Button color="inherit">Login</Button>
+            <Button color="inherit" onClick={handleLogout}>Logout</Button>
           </Toolbar>
         </AppBar>
       </Box>

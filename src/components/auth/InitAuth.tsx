@@ -6,7 +6,8 @@ import api from '../../api/default';
 import { generateCodeVerifier, generateCodeChallenge } from "../../utils/pkce";
 import { Button, Box } from '@mui/material';
 
-const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
+const CLIENT_ID = import.meta.env.VITE_CLIENT_ID
+const ALLOWED_REDIRECT_URLS = import.meta.env.VITE_ALLOWED_REDIRECT_URLS
 
 const InitAuth: React.FC = () => {
   const [ isAuthenticating, setIsAuthenticating ] = useState(false);
@@ -20,23 +21,31 @@ const InitAuth: React.FC = () => {
     sessionStorage.setItem('code_verifier', codeVerifier);
 
     const clientId = CLIENT_ID || '1';
-    const redirectUri = `${URL}/tokens`;
+    const URL = window.location.origin;
+    const redirectUrl = `${URL}/tokens`;
+
+    // verify url
+    const allowedRedirectUrls = ALLOWED_REDIRECT_URLS.split(',');
+    if (!allowedRedirectUrls.includes(redirectUrl)) {
+      throw new Error('Invalid redirect URL');
+    }
 
     // to verify later when auth_code is sent back
     const state = uuidv4();
     sessionStorage.setItem('oauth_state', state);
-
-    // Construct the authorization URL
+    console.log("Setting oauth_state: ", state);
     const authUrl = `/auth/authorize`
       + `?client_id=${clientId}`
-      + `&redirect_uri=${encodeURIComponent(redirectUri)}`
+      + `&redirect_url=${encodeURIComponent(redirectUrl)}`
       + `&code_challenge=${codeChallenge}`
       + `&code_challenge_method=S256`
       + `&oauth_state=${state}`;
 
+    console.log(`InitAuth redirectUrl: ${encodeURIComponent(redirectUrl)}`);
+
     const response = await api.get(authUrl);
-    const redirectUrl = response.data.redirectUrl;
-    navigate(`${redirectUrl}`);
+    const redirectPath = response.data.redirectPath;
+    navigate(`${redirectPath}`);
   }
 
   const handleLoginClick = async () => {

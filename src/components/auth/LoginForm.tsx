@@ -1,12 +1,15 @@
 // src/components/auth/LoginForm.tsx
-import React, { useState } from 'react';
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import api from '../../api/default';
-import { TextField, Typography, Button, FormControl, InputLabel, Box } from '@mui/material';
+import {Box, Button, FormControl, InputLabel, TextField, Typography} from '@mui/material';
+import * as path from "node:path";
 
 const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,8 +32,12 @@ const LoginForm: React.FC = () => {
     try {
       // Send the username, password, and auth_request_id to the backend
       const payload = { username, password, auth_request_id: authRequestId };
-      console.log("Sending request to auth/login. Username and requestId:", payload.auth_request_id);
-      await api.post(`/auth/login`, payload);
+      console.log("Login form -> auth/login. requestId:", payload.auth_request_id);
+
+      const response = await api.post(`/auth/login`, payload);
+      const redirectUrl = new URL(response.data.redirectUrl)
+      const redirectPath = redirectUrl.pathname + redirectUrl.search;
+      navigate(`${redirectPath}`)
     } catch (error) {
       console.error('Error logging in: ', error);
       setErrorMessage('Invalid username or password.');

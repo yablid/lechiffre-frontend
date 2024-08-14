@@ -15,7 +15,7 @@ const TokenExchange: React.FC = () => {
       // Extract the authorization code from the URL
       const urlParams = new URLSearchParams(window.location.search);
       const oauth_state = urlParams.get('oauth_state');
-      const original_oauth_state = sessionStorage.get('oauth_state');
+      const original_oauth_state = sessionStorage.getItem('oauth_state');
       if (oauth_state !== original_oauth_state) {
         throw new Error('Invalid state parameter.');
       }
@@ -36,9 +36,8 @@ const TokenExchange: React.FC = () => {
             code_verifier: codeVerifier,
           }
         );
-
-        // Store tokens and user info in context
         login(response.data.accessToken, response.data.idToken);
+        console.log("Tokens exchanged. Redirecting to /work...");
         navigate('/work'); // Redirect to the protected page after successful token exchange
       } catch (error) {
         console.error('Error exchanging tokens:', error);
