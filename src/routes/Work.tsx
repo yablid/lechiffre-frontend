@@ -10,7 +10,7 @@ const Work: FC = () => {
 
   return (
     <div>
-      <Navbar username={username}/>
+      <p>do work stuff here</p>
     </div>
   )
 }
