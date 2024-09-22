@@ -10,10 +10,10 @@ import IconButton from '@mui/material/IconButton'
 import MenuIcon from '@mui/icons-material/Menu';
 
 interface NavbarProps {
-  username: string
+  email: string
 }
 
-const Navbar: React.FC<NavbarProps> = ({ username }) => {
+const Navbar: React.FC<NavbarProps> = ({ email }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -36,7 +36,7 @@ const Navbar: React.FC<NavbarProps> = ({ username }) => {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              {username}
+              {email}
             </Typography>
             <Button color="inherit" onClick={handleLogout}>Logout</Button>
           </Toolbar>

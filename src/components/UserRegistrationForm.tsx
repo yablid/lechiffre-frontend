@@ -7,14 +7,14 @@ import Box from '@mui/material/Box';
 interface UserRegistrationFormProps {}
 
 const UserRegistrationForm: React.FC<UserRegistrationFormProps> = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [role, setRole] = useState(50); // default to engineer
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const userData = {
-      username,
+      email,
       role_id: role,
     };
     try {
@@ -45,9 +45,9 @@ const UserRegistrationForm: React.FC<UserRegistrationFormProps> = () => {
           <FormControl fullWidth variant="outlined">
             <TextField
               variant="outlined"
-              label='Username'
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              label='Email'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               fullWidth
             />
           </FormControl>

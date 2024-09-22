@@ -6,7 +6,7 @@ import {Box, Button, FormControl, InputLabel, TextField, Typography} from '@mui/
 import * as path from "node:path";
 
 const LoginForm: React.FC = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
@@ -16,8 +16,8 @@ const LoginForm: React.FC = () => {
     setErrorMessage('');
 
     // Client-side validation
-    if (!username || !password) {
-      setErrorMessage('Please enter a username and password.');
+    if (!email || !password) {
+      setErrorMessage('Please enter a username (email) and password.');
       return;
     }
 
@@ -31,7 +31,7 @@ const LoginForm: React.FC = () => {
 
     try {
       // Send the username, password, and auth_request_id to the backend
-      const payload = { username, password, auth_request_id: authRequestId };
+      const payload = { email, password, auth_request_id: authRequestId };
       console.log("Login form -> auth/login. requestId:", payload.auth_request_id);
 
       const response = await api.post(`/auth/login`, payload);
@@ -58,12 +58,12 @@ const LoginForm: React.FC = () => {
         style={{ maxWidth: '400px', width: '60%' }}
       >
         <FormControl fullWidth variant="outlined" sx={{ marginBottom: '1rem' }}>
-          <InputLabel sx={{ color: 'lightblue' }}>Username</InputLabel>
+          <InputLabel sx={{ color: 'lightblue' }}>Username (Email)</InputLabel>
           <TextField
             className="bg-white"
             variant="outlined"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             fullWidth
             margin="normal"
           />

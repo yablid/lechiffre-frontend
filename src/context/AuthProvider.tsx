@@ -2,7 +2,7 @@
 import React, { createContext, useState, useEffect, useCallback, useContext, ReactNode } from 'react';
 import api from '../api/default';
 import { jwtDecode } from 'jwt-decode';
-import { verifyAccessToken, verifyRefreshToken, verifyIdToken } from "../services/authService";
+import { verifyAccessToken, verifyRefreshToken, verifyIdToken } from "../services/auth.service";
 
 interface IAuthContext {
   user: IUser | null;
@@ -13,8 +13,8 @@ interface IAuthContext {
 
 export interface IUser {
   sub?: string,
-  roles?: number[];
-  username?: string;
+  role: number;
+  email?: string;
 }
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);

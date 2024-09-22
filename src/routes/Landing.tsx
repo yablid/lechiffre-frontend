@@ -10,6 +10,8 @@ const LandingPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("Layout user: ", user);
+    console.log("Layout loading: ", loading);
     if (!loading && user) {
       navigate('/work');
     }
@@ -21,7 +23,7 @@ const LandingPage: React.FC = () => {
 
   return (
     <Box>
-      <InitAuth/>
+      <InitAuth />
     </Box>
   );
 };

@@ -1,8 +1,8 @@
-// src/services/authService.ts
+// src/services/auth.service.ts
 
 import api from '../api/default';
 import {jwtDecode} from 'jwt-decode';
-import {IUser} from '../context/AuthProvider';
+import { IUser } from '../context/AuthProvider';
 
 export const verifyAccessToken = async (): Promise<IUser | null> => {
   const accessToken = sessionStorage.getItem('access_token');
@@ -32,8 +32,8 @@ export const verifyRefreshToken = async (): Promise<IUser | null> => {
     const idTokenData = jwtDecode<IUser>(response.data.idToken);
     return {
       sub: accessTokenData.sub,
-      roles: accessTokenData.roles,
-      username: idTokenData.username,
+      role: accessTokenData.role,
+      email: idTokenData.email,
     };
   } catch {
     return null;

@@ -10,7 +10,7 @@ const Layout: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Navbar username={user?.username || 'Guest'} />
+      <Navbar email={user?.email || 'Guest@guest.com'} />
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Outlet />
       </Box>
