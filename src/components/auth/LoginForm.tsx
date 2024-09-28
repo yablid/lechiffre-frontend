@@ -6,8 +6,9 @@ import {Box, Button, FormControl, InputLabel, TextField, Typography} from '@mui/
 import * as path from "node:path";
 
 const LoginForm: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  // todo: remove defaults
+  const [email, setEmail] = useState('supervisor@gmail.com');
+  const [password, setPassword] = useState('testtest');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 

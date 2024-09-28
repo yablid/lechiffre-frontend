@@ -1,8 +1,7 @@
 // components/NewProject.tsx
 import React, { useState } from 'react';
-import axios from 'axios';
 
-import { uploadDPGF } from '../services/project.service';
+import { uploadDPGF } from '../services/dpgf.service';
 
 import InputFileUpload from '../components/InputFileUpload';
 
@@ -48,11 +47,9 @@ const NewProject: React.FC = () => {
         <FormLabel component="legend" sx={{ marginBottom: 2 }}>
           Upload Excel File
         </FormLabel>
-
         <FormGroup
               sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
         >
-
           <InputFileUpload onFileSelect={handleFileChange} />
           {file && (
             <Box sx={{ padding: 4, fontSize: 18, color: 'primary.main' }}>
@@ -70,7 +67,6 @@ const NewProject: React.FC = () => {
             Add Project
         </Button>
         </FormGroup>
-
       </FormControl>
     </Box>
   );

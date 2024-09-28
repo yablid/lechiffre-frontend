@@ -1,4 +1,4 @@
-// src/services/projectService.ts
+// src/services/dpgf.service.ts
 import api from '../api/default';
 
 export const uploadDPGF = async (file: File) => {
@@ -9,14 +9,14 @@ export const uploadDPGF = async (file: File) => {
   formData.append('file', file);
 
   try {
-    const response = await api.post('project/uploadDPGF', formData, {
+    const response = await api.post('project/dpgf/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
 
-/*    console.log("File uploaded successfully. Server response:");
-    console.log("Response Data:", response.data);*/
+    console.log("File uploaded successfully. Server response:");
+    console.log("Response Data:", response.data);
 
     return response.data;
   } catch (error) {
