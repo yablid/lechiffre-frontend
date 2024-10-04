@@ -1,7 +1,8 @@
 // src/services/dpgf.service.ts
 import api from '../api/default';
+import { UploadDPGFResponseDTO } from './dto/dpgf.dto';
 
-export const uploadDPGF = async (file: File) => {
+export const uploadDPGF = async (file: File): Promise<UploadDPGFResponseDTO> => {
 
   console.log("project.service.uploadDPGF uploading file name: ", file.name, "(size: ", file.size, "bytes)");
 

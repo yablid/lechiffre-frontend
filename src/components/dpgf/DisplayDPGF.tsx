@@ -1,53 +1,54 @@
+// components/dpgf/DisplayDPGF.tsx
 import React from 'react';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { Paper } from '@mui/material';
 
-// Helper function to transpose the data
-const transposeData = (df) => {
-  const keys = Object.keys(df);
-  const numRows = df[keys[0]].length;  // Assuming all columns have the same length
-  const transposed = [];
+// All rows must have same number of columns
 
-  for (let i = 0; i < numRows; i++) {
-    const row = keys.map((key) => df[key][i]);  // Create a row from each column
-    transposed.push(row);
-  }
+// Define the type for the worksheet prop
+interface Worksheet {
+  df: {
+    [key: string]: string[]; // The keys are rows (e.g., row_0, row_1, etc.)
+  };
+}
 
-  return transposed;
-};
+interface DisplayWorksheetProps {
+  worksheet: Worksheet;
+}
 
-const WorksheetTable = ({ worksheets }) => {
+const DisplayWorksheet: React.FC<DisplayWorksheetProps> = ({ worksheet }) => {
+  const { df } = worksheet;
+
+  const rowKeys = Object.keys(df);
+  const numCols = df[rowKeys[0]].length;
+
+  const columns: GridColDef[] = Array.from({ length: numCols }, (_, colIndex) => ({
+    field: `column_${colIndex}`,
+    headerName: `Column ${colIndex + 1}`, // Naming columns "Column 1", "Column 2", etc.
+    width: 150, // Set a default width for columns
+  }));
+
+  const rows = rowKeys.map((key, rowIndex) => {
+    const rowData: { id: number; [key: string]: string | number } = { id: rowIndex }; // DataGrid requires unique key
+
+    df[key].forEach((cell, colIndex) => {
+      rowData[`column_${colIndex}`] = cell; // key should match field from GridColDef
+    });
+
+    return rowData;
+  });
+
   return (
-    <div>
-      {worksheets.map((worksheet, index) => {
-        const transposedData = transposeData(worksheet.df);
-
-        return (
-          <div key={index}>
-            <h2>Worksheet {index + 1}</h2>
-            <table border="1" cellPadding="10" cellSpacing="0">
-              <thead>
-                <tr>
-                  <th>Column</th>
-                  {Object.keys(worksheet.df).map((colKey, idx) => (
-                    <th key={idx}>{colKey}</th>  // Column headers: column_0, column_1, etc.
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {transposedData.map((row, rowIndex) => (
-                  <tr key={rowIndex}>
-                    <td>Row {rowIndex + 1}</td> {/* Row index or any other identifier */}
-                    {row.map((cell, cellIndex) => (
-                      <td key={cellIndex}>{cell}</td>  // Render each cell in the transposed row
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        );
-      })}
-    </div>
+    <Paper sx={{ height: 400, width: '100%' }}>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        pageSizeOptions={[5, 10]}
+        checkboxSelection
+        sx={{ border: 0 }}
+      />
+    </Paper>
   );
 };
 
-export default WorksheetTable;
+export default DisplayWorksheet;
